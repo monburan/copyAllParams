@@ -3,6 +3,7 @@ package burp;
 import java.util.List;
 import java.awt.Toolkit;
 import java.util.Arrays;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.io.PrintStream;
 import java.io.OutputStream;
@@ -58,6 +59,12 @@ public class BurpExtender implements IBurpExtender, IContextMenuFactory {
 		
 	}
 	
+	/**
+	 * 获取请求中测参数数据
+	 * @param message
+	 * @return
+	 */
+	
 	private List<IParameter> getRequestParameters(IHttpRequestResponse message) {
 		
 		List<IParameter> parameters = helpers.analyzeRequest(message).getParameters();
@@ -65,6 +72,11 @@ public class BurpExtender implements IBurpExtender, IContextMenuFactory {
 		return parameters;
 		
 	}
+	
+	/**
+	 * 获取系统剪贴板并设置处理好的参数
+	 * @param paramnames
+	 */
 	
 	public static void setclipboardString(String paramnames) {
 		
@@ -78,15 +90,21 @@ public class BurpExtender implements IBurpExtender, IContextMenuFactory {
 	
 	private void copyAllParams(IHttpRequestResponse[] messages) {
 		try {
+			
 			for(IHttpRequestResponse message : messages) {
 				
 				List<String> pnamelist = new ArrayList<>();
 				List<IParameter> params = getRequestParameters(message);
 				for (IParameter param : params) {
-					pnamelist.add(param.getName());
+					
+					String pname = param.getName();
+					pnamelist.add(URLDecoder.decode(pname, "UTF-8"));
+					
 				}
 				String paramnames = String.join(",", pnamelist);
+				
 				Outputlog("[!]get all param name: " + paramnames);
+				
 				setclipboardString(paramnames);
 				
 			}
